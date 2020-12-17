@@ -1,5 +1,4 @@
-# ProShop
-MERN eCommerce
+# ProShop (MERN eCommerce)
 
 -Full featured shopping cart
 
