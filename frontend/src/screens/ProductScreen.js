@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap';
 
 import Rating from '../components/Rating';
+import Message from '../components/Message';
+import Loader from '../components/Loader';
+import { listProductDetails } from '../actions/productActions';
 
 const ProductScreen = ({ match }) => {
-  const [product, setProduct] = useState({});
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      const { data } = await axios.get(`/api/products/${match.params.id}`);
-      setProduct(data);
-    };
-    fetchProduct();
-  }, [match]);
-
+  const productDetails = useSelector((state) => state.productDetails);
+  const { loading, error, product } = productDetails;
   const {
     image,
     name,
@@ -26,57 +23,67 @@ const ProductScreen = ({ match }) => {
     countInStock,
   } = product;
 
+  useEffect(() => {
+    dispatch(listProductDetails(match.params.id));
+  }, [dispatch, match]);
+
   return (
     <>
       <Link className='btn btn-light m-3' to='/'>
         Go Back
       </Link>
-      <Row>
-        <Col md={6}>
-          <Image src={image} alt={name} fluid />
-        </Col>
-        <Col md={3}>
-          <ListGroup variant='flush'>
-            <ListGroup.Item>
-              <h3>{name}</h3>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Rating value={rating} text={`${numReviews} reviews`} />
-            </ListGroup.Item>
-            <ListGroup.Item>Price: ${price}</ListGroup.Item>
-            <ListGroup.Item>Description: ${description}</ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={3}>
-          <Card>
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Message variant='danger'>{error}</Message>
+      ) : (
+        <Row>
+          <Col md={6}>
+            <Image src={image} alt={name} fluid />
+          </Col>
+          <Col md={3}>
             <ListGroup variant='flush'>
               <ListGroup.Item>
-                <Row>
-                  <Col>Price:</Col>
-                  <Col>
-                    <strong>${price}</strong>
-                  </Col>
-                </Row>
+                <h3>{name}</h3>
               </ListGroup.Item>
               <ListGroup.Item>
-                <Row>
-                  <Col>Status:</Col>
-                  <Col>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</Col>
-                </Row>
+                <Rating value={rating} text={`${numReviews} reviews`} />
               </ListGroup.Item>
-              <ListGroup.Item>
-                <Button
-                  className='btn-block'
-                  type='button'
-                  disabled={countInStock === 0}
-                >
-                  Add To Card
-                </Button>
-              </ListGroup.Item>
+              <ListGroup.Item>Price: ${price}</ListGroup.Item>
+              <ListGroup.Item>Description: ${description}</ListGroup.Item>
             </ListGroup>
-          </Card>
-        </Col>
-      </Row>
+          </Col>
+          <Col md={3}>
+            <Card>
+              <ListGroup variant='flush'>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Price:</Col>
+                    <Col>
+                      <strong>${price}</strong>
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Status:</Col>
+                    <Col>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Button
+                    className='btn-block'
+                    type='button'
+                    disabled={countInStock === 0}
+                  >
+                    Add To Card
+                  </Button>
+                </ListGroup.Item>
+              </ListGroup>
+            </Card>
+          </Col>
+        </Row>
+      )}
     </>
   );
 };
