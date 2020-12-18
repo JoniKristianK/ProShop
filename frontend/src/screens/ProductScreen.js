@@ -14,7 +14,7 @@ const ProductScreen = ({ match }) => {
       setProduct(data);
     };
     fetchProduct();
-  }, [setProduct, match.params.id]);
+  }, [match]);
 
   const {
     image,
