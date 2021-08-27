@@ -1,5 +1,7 @@
 # ProShop (MERN eCommerce)
 
+*in progress*
+
 -Full featured shopping cart
 
 -Product reviews and ratings
